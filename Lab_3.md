@@ -5,7 +5,7 @@
 ---
 ## Lab 3 - Finite State Machines (FSM)
 
-**_Peter Cheung, @saturn691, V1.2 - 30 Oct 2024_**
+**_Peter Cheung, @saturn691, V1.4 - 30 Oct 2025_**
 
 ---
 
