@@ -2,8 +2,8 @@
  \file    vbuddy.cpp
  \brief   additional C++ code included in DUT testbench file to communicate with Vbuddy
  \author  Peter Cheung, Imperial College London
- \version 1.4
- \date    28 Oct 2022
+ \version 1.3
+ \date    22 Oct 2022
 
 This package is written to support a second year module on Electronics & Information Engineering (EIE)
 at Imperial College. The module is on the design of the RISC V CPU.
@@ -32,6 +32,8 @@ void vbdHex(int digit, int v);
 // Plot y value scaled between min and max on TFT screen on next x coord.
 //    ... When x reaches 240, screen is cleare and x starts from 0 again.
 void vbdPlot(int y, int min, int max);
+
+void vbdBar(int value);
 
 // Write header at top of TFT, centre justified
 void vbdHeader(const char *header);
@@ -69,12 +71,6 @@ int vbdMicValue();
 // Return 0 if no key is pressed, otherwise return ASCII code of key
 // ... this function is non-blocking and does not actually use Vbuddy
 char vbdGetkey();
-
-// Initialise an internal stop watch in msec on Vbuddy
-void vbdInitWatch();
-
-// Returns elapsed time in msec since last vbdInitWatch() call
-int vbdElapsed();
 
 // ---- End of Vbuddy User Function declarations
 
@@ -1211,6 +1207,14 @@ void vbdPlot(int y, int min, int max)
     ack();
 }
 
+void vbdBar(int value)
+{
+    char msg[80]; // max 80 characters
+    sprintf(msg, "$B,%d\n", value);
+    serial.writeString(msg);
+    ack();
+}
+
 void vbdHeader(const char *header)
 {
     char msg[80]; // max 80 characters
@@ -1327,50 +1331,6 @@ int vbdMicValue()
     int iend;
 
     sprintf(msg, "$m\n");
-    serial.writeString(msg);
-    serial.flushReceiver();
-    do
-    {
-        n = serial.readStringNoTimeOut(msg, finalChar, 10);
-    } while ((n <= 0));
-    string str = msg;
-    istart = str.find("$");
-    if (int(msg[1]) < 48)
-    {                           // this is a hack !!!!! - if not num, look for 2nd $
-        str.erase(istart, 1);   // not sure why we need it
-        istart = str.find("$"); // spurious $ appears every other run ?????
-    }
-    iend = str.find("*");
-    str.erase(istart, 1); // remove leading '$'
-    str.erase(iend, 1);   // remove trailing '*'
-    return (stoi(str));
-}
-
-void vbdBar(int v)
-{                 // turn LED RED according to 8 bit value (1 = ON)
-    char msg[80]; // max 80 characters
-    std::sprintf(msg, "$B,%d\n", v);
-    serial.writeString(msg);
-    ack();
-}
-
-void vbdInitWatch()
-{                 // start stop watch timer
-    char msg[80]; // max 80 characters
-    sprintf(msg, "$W\n");
-    serial.writeString(msg);
-    ack();
-}
-
-int vbdElapsed()
-{                 // return elapsed time in ms
-    char msg[80]; // max 80 characters
-    char finalChar = '*';
-    int n;
-    int istart;
-    int iend;
-
-    sprintf(msg, "$w\n");
     serial.writeString(msg);
     serial.flushReceiver();
     do

@@ -23,7 +23,7 @@ int main(int argc, char **argv, char **env)
     // init Vbuddy
     if (vbdOpen() != 1)
         return (-1);
-    vbdHeader("L3T2:Clktick");
+    vbdHeader("L3T3:Clktick");
     vbdSetMode(1); // Flag mode set to one-shot
 
     // initialize simulation inputs
